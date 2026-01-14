@@ -1,4 +1,5 @@
 import requests
+from urllib.parse import quote
 from typing import List, Dict, Optional
 from datetime import datetime
 import time
@@ -125,6 +126,8 @@ class HatenaBookmarkClient:
                     entry_url = detail.get('entry_url', entry_url)
                     bookmarks = detail.get('bookmarks', bookmarks)
                     screenshot = detail.get('screenshot', '')
+                if not screenshot:
+                    screenshot = f"{self.BASE_URL}/entry/image/{quote(url, safe='')}"
 
             return {
                 'title': title,

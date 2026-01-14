@@ -17,31 +17,51 @@ class SlackNotifier:
             print("通知する記事がありません")
             return
         
-        blocks = self._build_blocks(articles, category_map)
-        payload = {"blocks": blocks}
-        
-        try:
-            response = requests.post(
-                self.webhook_url,
-                json=payload,
-                timeout=10
+        article_blocks = [self._build_article_block(article) for article in articles]
+        # Slack block limit is 50; keep some headroom for header/context/divider.
+        max_articles_per_message = 47
+        chunks = [
+            article_blocks[i:i + max_articles_per_message]
+            for i in range(0, len(article_blocks), max_articles_per_message)
+        ]
+
+        for index, chunk in enumerate(chunks, start=1):
+            blocks = self._build_blocks(
+                chunk,
+                total_count=len(articles),
+                page=index,
+                total_pages=len(chunks),
             )
-            response.raise_for_status()
-            print(f"✅ {len(articles)}件の記事をSlackに通知しました")
-        
-        except requests.RequestException as e:
-            print(f"❌ Slack通知エラー: {e}")
+            payload = {"blocks": blocks}
+
+            try:
+                response = requests.post(
+                    self.webhook_url,
+                    json=payload,
+                    timeout=10
+                )
+                response.raise_for_status()
+            except requests.RequestException as e:
+                print(f"❌ Slack通知エラー: {e}")
+                return
+
+        print(f"✅ {len(articles)}件の記事をSlackに通知しました")
     
-    def _build_blocks(self, articles: List[Dict], category_map: Dict[str, str] = None) -> List[Dict]:
+    def _build_blocks(
+        self,
+        articles: List[Dict],
+        total_count: int,
+        page: int,
+        total_pages: int,
+    ) -> List[Dict]:
         """Slack Block Kitメッセージを構築"""
-        category_map = category_map or {}
-        
+        page_suffix = f" ({page}/{total_pages})" if total_pages > 1 else ""
         blocks = [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"📚 はてブ注目記事 ({len(articles)}件)",
+                    "text": f"📚 はてブ注目記事 ({total_count}件){page_suffix}",
                     "emoji": True
                 }
             },
@@ -56,30 +76,10 @@ class SlackNotifier:
             },
             {"type": "divider"}
         ]
-        
-        # カテゴリ別にグループ化
-        categorized = {}
+
         for article in articles:
-            category = category_map.get(article['url'], 'その他')
-            if category not in categorized:
-                categorized[category] = []
-            categorized[category].append(article)
-        
-        # カテゴリごとに表示
-        for category, cat_articles in categorized.items():
-            emoji = self._get_category_emoji(category)
-            
-            blocks.append({
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*{emoji} {category}*"
-                }
-            })
-            
-            for article in cat_articles[:5]:  # カテゴリごとに最大5件
-                blocks.append(self._build_article_block(article))
-        
+            blocks.append(self._build_article_block(article))
+
         return blocks
     
     def _build_article_block(self, article: Dict) -> Dict:
