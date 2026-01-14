@@ -1,0 +1,1 @@
+# Hatena Slack Notifier Package

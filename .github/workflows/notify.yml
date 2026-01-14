@@ -1,0 +1,53 @@
+name: Hatena to Slack Notification
+
+on:
+  schedule:
+    # 平日: 9時、12時、18時 (JST) = 0時、3時、9時 (UTC)
+    - cron: '0 0,3,9 * * 1-5'
+    # 休日: 12時、18時 (JST) = 3時、9時 (UTC)
+    - cron: '0 3,9 * * 0,6'
+  workflow_dispatch:  # 手動実行
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run notification script
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MIN_BOOKMARKS: ${{ vars.MIN_BOOKMARKS || '50' }}
+          KEYWORDS: ${{ vars.KEYWORDS || '' }}
+          MAX_NOTIFY_COUNT: ${{ vars.MAX_NOTIFY_COUNT || '20' }}
+          HATENA_CATEGORY: ${{ vars.HATENA_CATEGORY || 'all' }}
+          FETCH_LIMIT: ${{ vars.FETCH_LIMIT || '50' }}
+          LOOKBACK_DAYS: ${{ vars.LOOKBACK_DAYS || '0' }}
+          CLEANUP_DAYS: ${{ vars.CLEANUP_DAYS || '0' }}
+        run: |
+          python -m src.main
+      
+      - name: Commit updated data
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/notified_articles.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update notified articles [skip ci]"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
