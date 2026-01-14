@@ -84,10 +84,10 @@ class SlackNotifier:
     
     def _build_article_block(self, article: Dict) -> Dict:
         """個別記事のブロックを構築"""
-        title = article['title']
-        url = article['url']
-        bookmarks = article['bookmarks']
-        entry_url = article.get('entry_url', '')
+        title = article.get('title') or 'Untitled'
+        url = article.get('url') or ''
+        bookmarks = article.get('bookmarks', 0)
+        entry_url = article.get('entry_url', '') or url
         
         text = f"*<{url}|{title}>*\n"
         text += f"🔖 <{entry_url}|{bookmarks} users>"
