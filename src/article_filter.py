@@ -26,10 +26,15 @@ class ArticleFilter:
     
     def _should_notify(self, article: Dict, notified_urls: set) -> bool:
         """通知すべきか判定"""
-        url = article.get('url', '')
-        title = article.get('title', '').lower()
+        url = (article.get('url') or '').strip()
+        title_raw = (article.get('title') or '').strip()
+        title = title_raw.lower()
         bookmarks = article.get('bookmarks', 0)
-        
+
+        # 必須項目チェック
+        if not url or not title_raw:
+            return False
+
         # 既読チェック
         if url in notified_urls:
             return False
