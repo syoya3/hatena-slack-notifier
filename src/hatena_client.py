@@ -99,9 +99,16 @@ class HatenaBookmarkClient:
         """エントリデータをパース"""
         try:
             if 'count' in entry or 'entry_url' in entry:
+                title = entry.get('title') or entry.get('subject') or entry.get('comment') or ''
+                url = entry.get('url') or entry.get('link') or entry.get('entry_url') or ''
+                if not url:
+                    return None
+                if not title:
+                    title = url
+
                 return {
-                    'title': entry.get('title', ''),
-                    'url': entry.get('url', ''),
+                    'title': title,
+                    'url': url,
                     'bookmarks': entry.get('count', 0),
                     'entry_url': entry.get('entry_url', ''),
                     'date': entry.get('date', ''),
