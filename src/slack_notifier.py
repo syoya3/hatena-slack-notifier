@@ -18,12 +18,11 @@ class SlackNotifier:
             print("通知する記事がありません")
             return
         
-        article_blocks = [self._build_article_block(article) for article in normalized_articles]
         # Slack block limit is 50; keep some headroom for header/context/divider.
         max_articles_per_message = 47
         chunks = [
-            article_blocks[i:i + max_articles_per_message]
-            for i in range(0, len(article_blocks), max_articles_per_message)
+            normalized_articles[i:i + max_articles_per_message]
+            for i in range(0, len(normalized_articles), max_articles_per_message)
         ]
 
         for index, chunk in enumerate(chunks, start=1):
