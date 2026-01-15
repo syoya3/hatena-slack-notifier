@@ -117,6 +117,8 @@ class SlackNotifier:
         for article in articles:
             url = (article.get('url') or '').strip()
             if not url:
+                url = (article.get('entry_url') or '').strip()
+            if not url:
                 continue
             title = (article.get('title') or '').strip() or url
             entry_url = (article.get('entry_url') or '').strip() or url

@@ -109,11 +109,15 @@ class HatenaBookmarkClient:
                 screenshot = entry.get('screenshot', '')
                 if not screenshot:
                     screenshot = f"{self.BASE_URL}/entry/image/{quote(url, safe='')}"
+                try:
+                    bookmarks = int(entry.get('count', 0))
+                except (TypeError, ValueError):
+                    bookmarks = 0
 
                 return {
                     'title': title,
                     'url': url,
-                    'bookmarks': entry.get('count', 0),
+                    'bookmarks': bookmarks,
                     'entry_url': entry_url,
                     'date': entry.get('date', ''),
                     'description': entry.get('description', ''),
