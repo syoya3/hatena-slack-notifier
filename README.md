@@ -9,6 +9,7 @@ pip install -r requirements.txt
 
 cat << 'ENV' > .env
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+SLACK_UNFURL=1
 MIN_BOOKMARKS=100
 KEYWORDS=
 MAX_NOTIFY_COUNT=20

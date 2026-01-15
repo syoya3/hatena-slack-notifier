@@ -17,6 +17,10 @@ class SlackNotifier:
         if not normalized_articles:
             print("通知する記事がありません")
             return
+
+        if self._should_unfurl():
+            self._send_unfurl_messages(normalized_articles)
+            return
         
         # Slack block limit is 50; keep some headroom for header/context/divider.
         max_articles_per_message = 47
@@ -135,6 +139,61 @@ class SlackNotifier:
             })
 
         return normalized
+
+    def _should_unfurl(self) -> bool:
+        return os.environ.get('SLACK_UNFURL', '').strip().lower() in ('1', 'true', 'yes')
+
+    def _send_unfurl_messages(self, articles: List[Dict]):
+        # Keep messages short enough to ensure unfurl rendering.
+        max_articles_per_message = 10
+        chunks = [
+            articles[i:i + max_articles_per_message]
+            for i in range(0, len(articles), max_articles_per_message)
+        ]
+
+        for index, chunk in enumerate(chunks, start=1):
+            text = self._build_unfurl_text(
+                chunk,
+                total_count=len(articles),
+                page=index,
+                total_pages=len(chunks),
+            )
+            payload = {
+                "text": text,
+                "unfurl_links": True,
+                "unfurl_media": True,
+            }
+
+            try:
+                response = requests.post(
+                    self.webhook_url,
+                    json=payload,
+                    timeout=10
+                )
+                response.raise_for_status()
+            except requests.RequestException as e:
+                print(f"❌ Slack通知エラー: {e}")
+                return
+
+        print(f"✅ {len(articles)}件の記事をSlackに通知しました")
+
+    def _build_unfurl_text(
+        self,
+        articles: List[Dict],
+        total_count: int,
+        page: int,
+        total_pages: int,
+    ) -> str:
+        page_suffix = f" ({page}/{total_pages})" if total_pages > 1 else ""
+        lines = [f"📚 はてブ注目記事 ({total_count}件){page_suffix}", "更新: 最新の人気記事", ""]
+        for article in articles:
+            title = article.get('title') or 'Untitled'
+            bookmarks = article.get('bookmarks', 0)
+            url = article.get('url') or ''
+            lines.append(f"{title} ({bookmarks} users)")
+            lines.append(url)
+            lines.append("")
+        return "\n".join(lines).rstrip()
     
     def _get_category_emoji(self, category: str) -> str:
         """カテゴリの絵文字を取得"""
