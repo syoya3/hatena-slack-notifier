@@ -105,15 +105,19 @@ class HatenaBookmarkClient:
                     return None
                 if not title:
                     title = url
+                entry_url = entry.get('entry_url', '') or url
+                screenshot = entry.get('screenshot', '')
+                if not screenshot:
+                    screenshot = f"{self.BASE_URL}/entry/image/{quote(url, safe='')}"
 
                 return {
                     'title': title,
                     'url': url,
                     'bookmarks': entry.get('count', 0),
-                    'entry_url': entry.get('entry_url', ''),
+                    'entry_url': entry_url,
                     'date': entry.get('date', ''),
                     'description': entry.get('description', ''),
-                    'screenshot': entry.get('screenshot', ''),
+                    'screenshot': screenshot,
                     'fetched_at': datetime.now().isoformat()
                 }
 

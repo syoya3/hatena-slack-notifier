@@ -13,11 +13,12 @@ class SlackNotifier:
     
     def send_articles(self, articles: List[Dict], category_map: Dict[str, str] = None):
         """記事をSlackに送信"""
-        if not articles:
+        normalized_articles = self._normalize_articles(articles)
+        if not normalized_articles:
             print("通知する記事がありません")
             return
         
-        article_blocks = [self._build_article_block(article) for article in articles]
+        article_blocks = [self._build_article_block(article) for article in normalized_articles]
         # Slack block limit is 50; keep some headroom for header/context/divider.
         max_articles_per_message = 47
         chunks = [
@@ -28,7 +29,7 @@ class SlackNotifier:
         for index, chunk in enumerate(chunks, start=1):
             blocks = self._build_blocks(
                 chunk,
-                total_count=len(articles),
+                total_count=len(normalized_articles),
                 page=index,
                 total_pages=len(chunks),
             )
@@ -45,7 +46,7 @@ class SlackNotifier:
                 print(f"❌ Slack通知エラー: {e}")
                 return
 
-        print(f"✅ {len(articles)}件の記事をSlackに通知しました")
+        print(f"✅ {len(normalized_articles)}件の記事をSlackに通知しました")
     
     def _build_blocks(
         self,
@@ -109,6 +110,30 @@ class SlackNotifier:
             }
         
         return block
+
+    def _normalize_articles(self, articles: List[Dict]) -> List[Dict]:
+        """記事データをSlack表示用に正規化"""
+        normalized = []
+        for article in articles:
+            url = (article.get('url') or '').strip()
+            if not url:
+                continue
+            title = (article.get('title') or '').strip() or url
+            entry_url = (article.get('entry_url') or '').strip() or url
+            try:
+                bookmarks = int(article.get('bookmarks', 0))
+            except (TypeError, ValueError):
+                bookmarks = 0
+
+            normalized.append({
+                **article,
+                'url': url,
+                'title': title,
+                'entry_url': entry_url,
+                'bookmarks': bookmarks,
+            })
+
+        return normalized
     
     def _get_category_emoji(self, category: str) -> str:
         """カテゴリの絵文字を取得"""
