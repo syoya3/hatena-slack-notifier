@@ -2,10 +2,8 @@ name: Hatena to Slack Notification
 
 on:
   schedule:
-    # 平日: 9時、12時、18時 (JST) = 0時、3時、9時 (UTC)
-    - cron: '0 0,3,9 * * 1-5'
-    # 休日: 12時、18時 (JST) = 3時、9時 (UTC)
-    - cron: '0 3,9 * * 0,6'
+    # 毎時 (UTC)
+    - cron: '0 * * * *'
   workflow_dispatch:  # 手動実行
 
 jobs:
