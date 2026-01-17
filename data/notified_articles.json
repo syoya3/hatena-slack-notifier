@@ -1145,6 +1145,18 @@
       "title": "KDDI系が仕様駆動開発を採用、AIで業務は「設計8割・開発2割」に",
       "bookmarks": 104,
       "notified_at": "2026-01-17T06:31:58.749944"
+    },
+    {
+      "url": "https://qiita.com/shiozaki/items/9d7aeac0dd6733a6e2fb",
+      "title": "画像をBase64で送るとサイズが33%増えるが、Gzip圧縮すれば「ほぼ元通り」になるという話 - Qiita",
+      "bookmarks": 108,
+      "notified_at": "2026-01-17T08:27:38.754464"
+    },
+    {
+      "url": "https://gigazine.net/news/20260116-uncensored-ai/",
+      "title": "検閲のゆるいAIランキング",
+      "bookmarks": 108,
+      "notified_at": "2026-01-17T08:27:38.754471"
     }
   ]
 }
