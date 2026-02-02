@@ -3035,6 +3035,12 @@
       "title": "8日投開票の衆議院選挙 比例投票先「自民」が全年代でトップ　JNN世論調査 | TBS NEWS DIG",
       "bookmarks": 300,
       "notified_at": "2026-02-02T17:38:58.324886"
+    },
+    {
+      "url": "https://zenn.dev/hcompany/articles/20260119_systemd_timer",
+      "title": "なぜcronからsystemd timerへ移行しているのか？歴史と設計思想から理解する",
+      "bookmarks": 381,
+      "notified_at": "2026-02-02T23:29:26.733349"
     }
   ]
 }
