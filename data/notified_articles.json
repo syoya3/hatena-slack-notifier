@@ -8669,6 +8669,12 @@
       "title": "名古屋・愛知に文化がない、というのは、本当だろうか？",
       "bookmarks": 300,
       "notified_at": "2026-05-05T21:03:33.269575"
+    },
+    {
+      "url": "https://zenn.dev/kusuke/articles/25330f7759eba4",
+      "title": "外部からアクセス可能なhttpsサイトはドメイン設定後「即」攻撃にさらされる件",
+      "bookmarks": 506,
+      "notified_at": "2026-05-06T02:50:35.469095"
     }
   ]
 }
