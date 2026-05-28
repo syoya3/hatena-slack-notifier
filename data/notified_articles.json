@@ -9743,6 +9743,12 @@
       "title": "暴力は絶対悪ってゆうやつ",
       "bookmarks": 315,
       "notified_at": "2026-05-27T21:55:49.982960"
+    },
+    {
+      "url": "https://zenn.dev/khale/articles/web-session-jwt-cookie-history",
+      "title": "「JWT を localStorage に置くな」はなぜ言われるのか、Cookie 回帰までの時系列整理",
+      "bookmarks": 331,
+      "notified_at": "2026-05-28T03:36:18.369791"
     }
   ]
 }
